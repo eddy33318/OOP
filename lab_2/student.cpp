@@ -20,7 +20,7 @@ void student::set_nota_engleza(float nota_engleza)
     this -> nota_engleza = nota_engleza;
 }
 char* student::get_name()
-{
+{  
     char *c;
     c = name;
     return c;
