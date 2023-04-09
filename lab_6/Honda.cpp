@@ -14,8 +14,8 @@ float Honda::getFuelConsumption()
 
 float Honda::getTopSpeed(weather w)
 {
-        int s;
-    s = rand() % 120; 
+    int s;
+    s = rand() % 120;
     float x;
     x = 225.5f;
     switch (w)

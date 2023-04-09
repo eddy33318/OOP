@@ -35,4 +35,5 @@ float Nissan::getTopSpeed(weather w)
     default:
         break;
     }
-    return x;}
+    return x;
+}

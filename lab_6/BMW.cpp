@@ -34,5 +34,3 @@ float BMW::getTopSpeed(weather w)
     }
     return x;
 }
-
-

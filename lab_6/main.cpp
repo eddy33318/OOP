@@ -13,7 +13,7 @@ int main()
     circuit c;
     weather w;
     c.SetLength(600);
-    c.SetWeather(w); //weather e ales random, mi s-a parut mai corect asa
+    c.SetWeather(w); // weather e ales random, mi s-a parut mai corect asa
     c.InitCarCount();
     c.AddCar(new Honda());
     c.AddCar(new Ferrari());
@@ -22,7 +22,6 @@ int main()
     c.Race();
     c.ShowFinalRanks();
     c.ShowWhoDidNotFinish();
-
 
     return 0;
 }
