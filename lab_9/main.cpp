@@ -1,86 +1,183 @@
-#include <string>
 #include <iostream>
-#include <vector>
-#include <map>
-#include <queue>
-#include <fstream>
 using namespace std;
-
-struct Comparer
+void print()
 {
-    bool operator()(const pair<string, int> &left, const pair<string, int> &right) const
+    printf("#######");
+}
+template <typename T, typename P>
+struct Map
+{
+    struct Element
     {
-        if (left.second != right.second)
+        P value;
+        T key;
+        int index;
+        Element &operator=(P value)
         {
-            return left.second < right.second;
+            this->value = value;
+            return *this;
         }
-        else
+    };
+
+    Element *data;
+    int size;
+
+    Element &operator[](T key)
+    {
+        for (int i = 0; i < size; i++)
         {
-            return left.first > right.first;
+            if (key == data[i].key)
+            {
+                return data[i];
+            }
         }
+        Element *copy = new Element[size + 1];
+        for (int i = 0; i < size; i++)
+        {
+            copy[i].key = data[i].key;
+            copy[i].value = data[i].value;
+            copy[i].index = data[i].index;
+        }
+        delete[] data;
+        data = new Element[size + 1];
+        for (int i = 0; i < size; i++)
+        {
+            data[i].key = copy[i].key;
+            data[i].value = copy[i].value;
+            data[i].index = copy[i].index;
+        }
+        size++;
+        data[size - 1].key = key;
+        data[size - 1].index = size - 1;
+        return data[size - 1];
+        delete[] copy;
+    }
+
+    Map()
+    {
+        data = new Element[100];
+        size = 0;
+    }
+
+    ~Map()
+    {
+        delete[] data;
+    }
+
+    struct iterator
+    {
+        Element *ptr;
+
+        iterator(Element *ptr)
+        {
+            this->ptr = ptr;
+        }
+
+        bool operator!=(iterator i)
+        {
+            return ptr != i.ptr;
+        }
+
+        void operator++()
+        {
+            ++ptr;
+        }
+
+        Element operator*()
+        {
+            return *ptr;
+        }
+    };
+
+    iterator begin()
+    {
+        return iterator(&data[0]);
+    }
+
+    iterator end()
+    {
+        return iterator(&data[size]);
+    }
+
+    void set(T newKey, T key)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            if (key == data[i].key)
+            {
+                data[i].key = newKey;
+            }
+        }
+    }
+    // bool Get(const T& key, const P& value)
+    // {
+    //     for(int i = 0; i < size; i++)
+    //     {
+    //         if(key == data[i].key)
+    //         {
+    //             data[i].value = key;
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
+    int count()
+    {
+        return size;
+    }
+    void clear()
+    {
+        size = 0;
+        delete[] data;
+    }
+    bool Delete(const T &key)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            if (key == data[i].key)
+            {
+                for (int j = i; j < size - 1; j++)
+                {
+                    data[j].index = data[j + 1].index;
+                    data[j].key = data[j + 1].key;
+                    data[j].value = data[j + 1].value;
+                }
+                size--;
+                return true;
+            }
+        }
+        return false;
     }
 };
 
 int main()
 {
-    int ok = -1;
-    string sep = ", .!?";
-    string word = "";
-    ifstream infile("input.txt");
-    string sentence;
-    map<string, int> map;
+    Map<int, const char *> m;
 
-    if (infile)
-    {                              // check if file was opened successfully
-        getline(infile, sentence); // read entire line into the string
-    }
-    cout << "\n";
-    for (auto x : sentence)
+    m[10] = "C++";
+    m[20] = "test";
+    m[30] = "Poo";
+
+    for (auto [value, key, index] : m)
     {
-        if (x >= 'A' && x <= 'Z')
-            x += 32;
-        ok = 0;
-        for (int i = 0; i < sep.size(); i++)
-        {
-            if (x == sep[i])
-            {
-                ok = 1;
-                break;
-            }
-        }
-        if (ok == 1)
-        {
-            if (word != "")
-                map[word]++; // put word in map and increase value
-            word = "";
-        }
-        else
-        {
-            word = word + x;
-        }
+        printf("Index:%d, Key=%d, Value=%s\n", index, key, value);
     }
-    if (word != "")
-        map[word]++; // add the last word of the sentence
 
-    std::priority_queue<pair<string, int>, vector<pair<string, int>>, Comparer> q;
-    for (auto &pair : map)
+    m[20] = "result";
+    m.set(15, 20);
+    m.clear();
+    // m.Get(15, "C++");
+
+    printf("\n%d\n", m.count());
+
+    m[10] = "C++";
+    m[50] = "test";
+    m[30] = "Poo";
+    m.Delete(30);
+    for (auto [value, key, index] : m)
     {
-        q.push(pair);
+        printf("Index:%d, Key=%d, Value=%s\n", index, key, value);
     }
 
-    while (!q.empty())
-    {
-        std::pair<string, int> pair = q.top();
-        std::cout << "Key: " << pair.first << ", Value: " << pair.second << std::endl;
-        q.pop();
-    }
-
-    // std::map<std::string, int>::iterator it = map.begin();
-    // while (it != map.end())
-    // {
-    //     std::cout << "Key:" << it->first << ", Value: " << it->second << std::endl;
-    //     ++it;
-    // }
-    infile.close(); // close file when done
     return 0;
 }
