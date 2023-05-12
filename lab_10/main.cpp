@@ -264,7 +264,24 @@ int Array<T>::Find(const T& elem)
 {
     for(int i = 0; i < Size; i++)
     if(*List[i] == elem) return i;
-    return -1;
+    throw "Could not find element!";
+}
+template <class T>
+int Array<T>:: BinarySearch(const T& elem)
+{
+    int l = 0;
+int r = Size - 1;
+while (l <= r)
+{
+    int m = l + (r - l) / 2;
+    if (*List[m] == elem)
+        return m; // Element found at index m.
+    else if (*List[m] < elem)
+        l = m + 1;
+    else
+        r = m - 1;
+}
+return -1; // Element not found.
 }
 
 template <class T>
@@ -306,7 +323,8 @@ int main()
     myArray.Insert(2, myArray2);
     myArray2.print();
     myArray.Sort();
-    printf("\n\n%d", myArray.Find(56));
+    printf("\n\n%d", myArray.Find(99));
+    printf("\n\n%d", myArray.BinarySearch(99));
     myArray.print();
     return 0;
 }
