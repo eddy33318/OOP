@@ -1,12 +1,48 @@
 
 #include <stdexcept>
 #include <iostream>
-template <class T>
 
-class Array
+template <class ArrayT>
 
+class ArrayIterator
 {
+private:
+    ArrayT **ptr;
 
+public:
+    ArrayIterator(ArrayT **vecPtr) : ptr(vecPtr) {}
+
+    ArrayIterator &operator++()
+    {
+        ++ptr;
+        return *this;
+    }
+
+    ArrayIterator &operator--()
+    {
+        --ptr;
+        return *this;
+    }
+
+    bool operator==(const ArrayIterator &otherIter) const
+    {
+        return (ptr == otherIter.ptr);
+    }
+
+    bool operator!=(const ArrayIterator &otherIter) const
+    {
+        return !(*this == otherIter);
+    }
+
+    ArrayT &operator*()
+    {
+        return **ptr;
+    }
+};
+
+template <class T>
+class Array
+{
 private:
     T **List; // lista cu pointeri la obiecte de tipul T*
 
@@ -29,13 +65,25 @@ public:
 
     const Array<T> &Insert(int index, const T &newElem); // adauga un element pe pozitia index, retureaza this. Daca index e invalid arunca o exceptie
 
+    const Array<T> &Insert(int index, const Array<T> otherArray); // adauga o lista pe pozitia index, retureaza this. Daca index e invalid arunca o exceptie
+
     const Array<T> &Delete(int index); // sterge un element de pe pozitia index, returneaza this. Daca index e invalid arunca o exceptie
 
     bool operator=(const Array<T> &otherArray);
 
+    void Sort(); // sorteaza folosind comparatia intre elementele din T
+
+    int BinarySearch(const T& elem); // cauta un element folosind binary search in Array
+
+    int Find(const T& elem); // cauta un element in Array
+
     void print();
 
     int GetSize();
+
+    ArrayIterator<T> begin();
+
+    ArrayIterator<T> end();
 };
 class OutOfBounds : public std::exception
 {
@@ -111,10 +159,10 @@ template <class T>
 bool Array<T>::operator=(const Array<T> &otherArray)
 {
     if (otherArray.Size == 0)
-        throw "Error! List is empty!";
+        throw "Error! Empty List!";
 
     if (otherArray.Capacity != Capacity)
-        throw "Error! Array capacity is different!";
+        throw "Error! Different capacities!";
     Size = otherArray.Size;
     for (int i = 0; i < otherArray.Size; i++)
         List[i] = otherArray.List[i];
@@ -140,6 +188,26 @@ const Array<T> &Array<T>::Insert(int index, const T &newElem)
 }
 
 template <class T>
+
+const Array<T> &Array<T>::Insert(int index, const Array<T> otherArray)
+{
+    int i;
+    if (index < 0 || index >= Capacity || Size >= Capacity)
+    {
+        throw OutOfBounds();
+    }
+    if (Size < otherArray.Size)
+    {
+        for (i = otherArray.Size - Size; i < otherArray.Size + index; i++)
+            List[i] = new T;
+    }
+    Size = otherArray.Size + index;
+    for (i = index; i < otherArray.Size + index; i++)
+        List[i] = otherArray.List[i - index];
+    return *this;
+}
+
+template <class T>
 const Array<T> &Array<T>::Delete(int index)
 {
     if (index < 0 || index >= Capacity)
@@ -159,6 +227,27 @@ const Array<T> &Array<T>::Delete(int index)
     Size--;
     return *this;
 }
+
+template <class T>
+ void Array<T>::Sort()
+ {
+    int i, j;
+    for(i = 0; i < Size; i++)
+    {
+        for(j = i + 1; j < Size; j++)
+        {
+            if(*List[i] > *List[j])
+            {
+                T* aux;
+                aux = List[i];
+                List[i] = List[j];
+                List[j] = aux;
+            }
+        }
+    }
+ }
+
+
 template <class T>
 
 void Array<T>::print()
@@ -171,18 +260,38 @@ void Array<T>::print()
 }
 
 template <class T>
+int Array<T>::Find(const T& elem)
+{
+    for(int i = 0; i < Size; i++)
+    if(*List[i] == elem) return i;
+    return -1;
+}
+
+template <class T>
 
 int Array<T>::GetSize()
 {
     return Size;
 }
 
+template <class T>
+
+ArrayIterator<T> Array<T>::begin()
+{
+    return ArrayIterator<T>(List);
+}
+
+template <class T>
+
+ArrayIterator<T> Array<T>::end()
+{
+    return ArrayIterator<T>(List + Size);
+}
+
 int main()
 {
     Array<int> myArray(10);
-
     myArray += 3;
-
     myArray.Insert(7, 99);
     myArray.Insert(3, 8);
     myArray.Insert(4, 1);
@@ -192,7 +301,12 @@ int main()
     printf("%d", myArray.GetSize());
     myArray.print();
     myArray2 += 100;
-    myArray2 = myArray;
+    myArray2 += 11111111;
+    // myArray2 = myArray;
+    myArray.Insert(2, myArray2);
     myArray2.print();
+    myArray.Sort();
+    printf("\n\n%d", myArray.Find(56));
+    myArray.print();
     return 0;
 }
