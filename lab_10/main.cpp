@@ -321,7 +321,7 @@ int main()
     myArray2 += 11111111;
     // myArray2 = myArray;
     myArray.Insert(2, myArray2);
-    myArray2.print();
+    myArray2.print();  
     myArray.Sort();
     printf("\n\n%d", myArray.Find(99));
     printf("\n\n%d", myArray.BinarySearch(99));
